@@ -1,0 +1,246 @@
+/* ==========================================
+   YOUTUPOST — Responsive
+   Breakpoints, Mobile, Tablet, Ultrawide
+   ========================================== */
+
+/* === Small Phones (< 375px) === */
+@media (max-width: 374px) {
+  :root {
+    --text-base: 0.875rem;
+    --text-sm: 0.75rem;
+    --space-4: 0.75rem;
+  }
+
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; }
+  .topbar { display: none; }
+
+  .mobile-topbar { display: flex; }
+  .mobile-bottom-nav { display: block; }
+
+  .page {
+    padding-top: var(--topbar-height);
+    padding-bottom: calc(var(--bottomnav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .content-wrapper { padding: 0 var(--space-3); }
+  .post-card { border-radius: var(--radius-md); }
+  .post-header { padding: var(--space-3); }
+  .post-body { padding: 0 var(--space-3) var(--space-2); }
+  .post-actions { padding: var(--space-2) var(--space-3); }
+
+  .story-item .story-avatar { width: 56px; height: 56px; }
+
+  .post-action-btn { padding: var(--space-1) var(--space-2); font-size: var(--text-xs); }
+  .post-action-btn svg { width: 18px; height: 18px; }
+
+  .mobile-bottom-nav .nav-item { min-width: 40px; padding: var(--space-1) var(--space-2); }
+}
+
+/* === Regular Phones (375px - 480px) === */
+@media (min-width: 375px) and (max-width: 480px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; }
+  .topbar { display: none; }
+
+  .mobile-topbar { display: flex; }
+  .mobile-bottom-nav { display: block; }
+
+  .page {
+    padding-top: var(--topbar-height);
+    padding-bottom: calc(var(--bottomnav-height) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* === Large Phones (481px - 768px) === */
+@media (min-width: 481px) and (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; }
+  .topbar { display: none; }
+
+  .mobile-topbar { display: flex; }
+  .mobile-bottom-nav { display: block; }
+
+  .page {
+    padding-top: var(--topbar-height);
+    padding-bottom: calc(var(--bottomnav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .content-wrapper { max-width: 560px; }
+}
+
+/* === Tablets (769px - 1024px) === */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: var(--z-overlay);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .main-content,
+  .main-content.sidebar-collapsed {
+    margin-left: 0;
+  }
+
+  .topbar { left: 0; }
+
+  .right-sidebar { display: none; }
+
+  .mobile-bottom-nav { display: none; }
+
+  .page {
+    padding-top: var(--topbar-height);
+    padding-bottom: 0;
+  }
+
+  .content-wrapper { max-width: 600px; }
+}
+
+/* === Laptops (1025px - 1280px) === */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .right-sidebar { width: 280px; }
+
+  .content-wrapper-wide {
+    grid-template-columns: 1fr 280px;
+    gap: var(--space-6);
+  }
+
+  .mobile-bottom-nav { display: none; }
+  .mobile-topbar { display: none; }
+}
+
+/* === Desktop (1281px - 1536px) === */
+@media (min-width: 1281px) and (max-width: 1536px) {
+  .mobile-bottom-nav { display: none; }
+  .mobile-topbar { display: none; }
+}
+
+/* === Ultrawide (1537px+) === */
+@media (min-width: 1537px) {
+  .main-content {
+    max-width: 1400px;
+    margin-left: var(--sidebar-width);
+    margin-right: auto;
+  }
+
+  .main-content.sidebar-collapsed {
+    margin-left: var(--sidebar-collapsed-width);
+  }
+
+  .content-wrapper-wide {
+    grid-template-columns: 1fr 340px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .mobile-bottom-nav { display: none; }
+  .mobile-topbar { display: none; }
+}
+
+/* === Common Mobile Styles === */
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+
+  /* Stories scroll */
+  .stories-container {
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .story-item .story-avatar { width: 58px; height: 58px; }
+
+  /* Post adjustments */
+  .post-card { border-radius: var(--radius-md); }
+
+  /* Modal fullscreen on mobile */
+  .modal-container {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+  }
+
+  .modal-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Chat fullscreen */
+  .chat-container {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+  }
+
+  /* Profile header compact */
+  .profile-header {
+    padding: var(--space-4) !important;
+  }
+
+  .profile-stats {
+    gap: var(--space-4) !important;
+  }
+
+  /* Explore grid */
+  .explore-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 2px !important;
+  }
+
+  /* Settings full width */
+  .settings-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .settings-sidebar {
+    display: none;
+  }
+
+  /* Search overlay */
+  .search-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+  }
+}
+
+/* === Touch Device Overrides === */
+@media (hover: none) and (pointer: coarse) {
+  .tooltip::after { display: none; }
+
+  .post-action-btn:hover {
+    background: transparent;
+    color: var(--text-secondary);
+  }
+
+  .post-action-btn:active {
+    background: var(--surface-hover);
+  }
+
+  .hover-lift:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .hover-glow:hover {
+    box-shadow: none;
+  }
+}
+
+/* === Safe Area Support === */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .mobile-bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(var(--bottomnav-height) + env(safe-area-inset-bottom));
+  }
+
+  .page {
+    padding-bottom: calc(var(--bottomnav-height) + env(safe-area-inset-bottom));
+  }
+}

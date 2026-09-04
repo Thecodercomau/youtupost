@@ -1,0 +1,96 @@
+/* ==========================================
+   YOUTUPOST — Themes
+   Theme Transitions & Overrides
+   ========================================== */
+
+/* === Theme Transition === */
+body.theme-transitioning * {
+  transition-duration: 0.4s !important;
+}
+
+/* === Accent Color Variants === */
+[data-accent="violet"] {
+  --color-primary: #6C5CE7;
+  --color-primary-light: #A29BFE;
+  --color-primary-dark: #5A4BD1;
+  --gradient-accent: linear-gradient(135deg, #6C5CE7, #A29BFE, #6C5CE7);
+}
+
+[data-accent="cyan"] {
+  --color-primary: #00CEFF;
+  --color-primary-light: #5DE5FF;
+  --color-primary-dark: #00A8CC;
+  --gradient-accent: linear-gradient(135deg, #00CEFF, #5DE5FF, #00CEFF);
+}
+
+[data-accent="emerald"] {
+  --color-primary: #00D68F;
+  --color-primary-light: #55EFC4;
+  --color-primary-dark: #00B377;
+  --gradient-accent: linear-gradient(135deg, #00D68F, #55EFC4, #00D68F);
+}
+
+[data-accent="solar"] {
+  --color-primary: #FFAA00;
+  --color-primary-light: #FFD166;
+  --color-primary-dark: #E09200;
+  --gradient-accent: linear-gradient(135deg, #FFAA00, #FFD166, #FFAA00);
+}
+
+[data-accent="rose"] {
+  --color-primary: #FF6B9D;
+  --color-primary-light: #FFA3C4;
+  --color-primary-dark: #E0527E;
+  --gradient-accent: linear-gradient(135deg, #FF6B9D, #FFA3C4, #FF6B9D);
+}
+
+[data-accent="ice"] {
+  --color-primary: #74B9FF;
+  --color-primary-light: #A3D5FF;
+  --color-primary-dark: #5BA3E0;
+  --gradient-accent: linear-gradient(135deg, #74B9FF, #A3D5FF, #74B9FF);
+}
+
+[data-accent="default"] {
+  --color-primary: #6C5CE7;
+  --color-primary-light: #A29BFE;
+  --color-primary-dark: #5A4BD1;
+  --gradient-accent: linear-gradient(135deg, #6C5CE7, #00CEFF, #0984E3);
+}
+
+/* === Light Theme Overrides === */
+[data-theme="light"] .topbar {
+  background: rgba(245, 246, 250, 0.88);
+}
+
+[data-theme="light"] .sidebar {
+  background: #FFFFFF;
+}
+
+[data-theme="light"] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] .share-sheet,
+[data-theme="light"] .bottom-sheet {
+  background: #FFFFFF;
+}
+
+[data-theme="light"] ::selection {
+  background: rgba(108, 92, 231, 0.2);
+}
+
+/* === OLED Theme Overrides === */
+[data-theme="oled"] .sidebar {
+  background: #000000;
+}
+
+[data-theme="oled"] .card,
+[data-theme="oled"] .post-card,
+[data-theme="oled"] .community-card {
+  background: #000000;
+}
+
+[data-theme="oled"] .topbar {
+  background: rgba(0, 0, 0, 0.9);
+}
