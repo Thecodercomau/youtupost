@@ -92,13 +92,31 @@
   <!-- Application Script -->
   <script type="module" src="js/app.js"></script>
 
-  <!-- Service Worker Registration -->
+  <!-- Service Worker: force-clear old caches and register fresh -->
   <script>
     if ('serviceWorker' in navigator) {
+      // Immediately unregister ALL old service workers and clear caches
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        Promise.all(regs.map(r => r.unregister()));
+      });
+      caches.keys().then(keys => {
+        Promise.all(keys.map(k => caches.delete(k)));
+      });
+      // Register fresh SW
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
+        navigator.serviceWorker.register('sw.js?v=3').catch(() => {});
       });
     }
+  </script>
+
+  <!-- Error fallback: show something if JS fails -->
+  <script>
+    window.addEventListener('error', function(e) {
+      console.error('Global error:', e.message, e.filename, e.lineno);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Unhandled rejection:', e.reason);
+    });
   </script>
 </body>
 </html>
