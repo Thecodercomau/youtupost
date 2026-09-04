@@ -28,14 +28,16 @@ async function loadSupabaseServices() {
    AUTH SERVICE
    ========================================== */
 export const AuthService = {
-  async signIn(username, password) {
+  signIn(username, password) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      const result = await _sbAuth.signIn(username, password);
-      if (result.success && result.profile) {
-        AppState.set('currentUser', result.profile.id);
-      }
-      return result;
+      return (async () => {
+        await loadSupabaseServices();
+        const result = await _sbAuth.signIn(username, password);
+        if (result.success && result.profile) {
+          AppState.set('currentUser', result.profile.id);
+        }
+        return result;
+      })();
     }
     // Demo mode
     const users = AppState.getVal('users') || [];
@@ -51,14 +53,16 @@ export const AuthService = {
     return { success: false, error: 'Invalid credentials' };
   },
 
-  async signUp(userData) {
+  signUp(userData) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbAuth.signUp(userData.email, userData.password, {
-        username: userData.username,
-        displayName: userData.displayName,
-        avatar: userData.avatar,
-      });
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbAuth.signUp(userData.email, userData.password, {
+          username: userData.username,
+          displayName: userData.displayName,
+          avatar: userData.avatar,
+        });
+      })();
     }
     // Demo mode
     const users = AppState.getVal('users') || [];
@@ -90,20 +94,25 @@ export const AuthService = {
     return { success: true, user: newUser };
   },
 
-  async signOut() {
+  signOut() {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      await _sbAuth.signOut();
+      return (async () => {
+        await loadSupabaseServices();
+        await _sbAuth.signOut();
+      })();
     }
     AppState.set('currentUser', null);
+    return Promise.resolve();
   },
 
-  async getCurrentUser() {
+  getCurrentUser() {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      const profile = await _sbAuth.getCurrentUser();
-      if (profile) AppState.set('currentUser', profile.id);
-      return profile;
+      return (async () => {
+        await loadSupabaseServices();
+        const profile = await _sbAuth.getCurrentUser();
+        if (profile) AppState.set('currentUser', profile.id);
+        return profile;
+      })();
     }
     const userId = AppState.getVal('currentUser');
     if (!userId) return null;
@@ -125,10 +134,12 @@ export const AuthService = {
    POST SERVICE
    ========================================== */
 export const PostService = {
-  async createPost(data) {
+  createPost(data) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.create(data);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.create(data);
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     const newPost = {
@@ -148,10 +159,12 @@ export const PostService = {
     return newPost;
   },
 
-  async getFeed(filter = 'for-you') {
+  getFeed(filter = 'for-you') {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.getFeed(filter);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.getFeed(filter);
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     const userId = AppState.getVal('currentUser');
@@ -161,17 +174,19 @@ export const PostService = {
     let filtered = posts.filter(p => !p.isArchived && !blocked.includes(p.userId));
 
     switch (filter) {
-      case 'following':
+      case 'following': {
         const following = relationships[userId] || [];
         filtered = filtered.filter(p => following.includes(p.userId) || p.userId === userId);
         break;
-      case 'friends':
+      }
+      case 'friends': {
         const myFollowing = relationships[userId] || [];
         filtered = filtered.filter(p => {
           const theirFollowing = relationships[p.userId] || [];
           return myFollowing.includes(p.userId) && theirFollowing.includes(userId);
         });
         break;
+      }
       case 'latest':
         filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         break;
@@ -185,29 +200,34 @@ export const PostService = {
     return filtered;
   },
 
-  async getPost(postId) {
+  getPost(postId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.getById(postId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.getById(postId);
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     return posts.find(p => p.id === postId);
   },
 
-  async getUserPosts(userId) {
+  getUserPosts(userId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.getUserPosts(userId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.getUserPosts(userId);
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     return posts.filter(p => p.userId === userId && !p.isArchived);
   },
 
-  async likePost(postId) {
+  likePost(postId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      await _sbPosts.like(postId);
-      return;
+      return (async () => {
+        await loadSupabaseServices();
+        await _sbPosts.like(postId);
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     const userId = AppState.getVal('currentUser');
@@ -222,10 +242,12 @@ export const PostService = {
     return post;
   },
 
-  async savePost(postId) {
+  savePost(postId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.save(postId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.save(postId);
+      })();
     }
     const saved = AppState.getVal('savedPosts') || [];
     if (saved.includes(postId)) {
@@ -238,10 +260,12 @@ export const PostService = {
     }
   },
 
-  async repostPost(postId, comment = '') {
+  repostPost(postId, comment = '') {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.create({ text: comment, repostOf: postId, type: 'repost' });
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.create({ text: comment, repostOf: postId, type: 'repost' });
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     const userId = AppState.getVal('currentUser');
@@ -257,10 +281,12 @@ export const PostService = {
     return original;
   },
 
-  async addComment(postId, text, parentId = null) {
+  addComment(postId, text, parentId = null) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.addComment(postId, text, parentId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.addComment(postId, text, parentId);
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     const post = posts.find(p => p.id === postId);
@@ -278,29 +304,35 @@ export const PostService = {
     return comment;
   },
 
-  async deletePost(postId) {
+  deletePost(postId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.delete(postId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.delete(postId);
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     AppState.set('posts', posts.filter(p => p.id !== postId));
   },
 
-  async archivePost(postId) {
+  archivePost(postId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.archive(postId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.archive(postId);
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     const post = posts.find(p => p.id === postId);
     if (post) { post.isArchived = true; AppState.set('posts', posts); }
   },
 
-  async getExplorePosts(category = null) {
+  getExplorePosts(category = null) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.getFeed('latest');
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.getFeed('latest');
+      })();
     }
     const posts = AppState.getVal('posts') || [];
     let filtered = posts.filter(p => !p.isArchived);
@@ -318,28 +350,34 @@ export const PostService = {
    PROFILE SERVICE
    ========================================== */
 export const ProfileService = {
-  async getUser(userId) {
+  getUser(userId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.getById(userId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.getById(userId);
+      })();
     }
     const users = AppState.getVal('users') || [];
     return users.find(u => u.id === userId);
   },
 
-  async getUserByUsername(username) {
+  getUserByUsername(username) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.getByUsername(username);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.getByUsername(username);
+      })();
     }
     const users = AppState.getVal('users') || [];
     return users.find(u => u.username.toLowerCase() === username.toLowerCase());
   },
 
-  async updateProfile(userId, data) {
+  updateProfile(userId, data) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.update(userId, data);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.update(userId, data);
+      })();
     }
     const users = AppState.getVal('users') || [];
     const user = users.find(u => u.id === userId);
@@ -347,40 +385,43 @@ export const ProfileService = {
     return user;
   },
 
-  async follow(targetUserId) {
+  follow(targetUserId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.follow(targetUserId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.follow(targetUserId);
+      })();
     }
-    const currentUser = AuthService.getCurrentUser?.() || (() => {
-      const users = AppState.getVal('users') || [];
-      return users.find(u => u.id === AppState.getVal('currentUser'));
-    })();
-    if (!currentUser) return false;
+    const userId = AppState.getVal('currentUser');
+    if (!userId) return false;
     const relationships = AppState.getVal('followRelationships') || {};
-    if (!relationships[currentUser.id]) relationships[currentUser.id] = [];
-    if (relationships[currentUser.id].includes(targetUserId)) {
-      relationships[currentUser.id] = relationships[currentUser.id].filter(id => id !== targetUserId);
+    if (!relationships[userId]) relationships[userId] = [];
+    if (relationships[userId].includes(targetUserId)) {
+      relationships[userId] = relationships[userId].filter(id => id !== targetUserId);
     } else {
-      relationships[currentUser.id].push(targetUserId);
+      relationships[userId].push(targetUserId);
     }
     AppState.set('followRelationships', relationships);
-    return relationships[currentUser.id].includes(targetUserId);
+    return relationships[userId].includes(targetUserId);
   },
 
-  async isFollowing(userId, targetId) {
+  isFollowing(userId, targetId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.isFollowing(userId, targetId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.isFollowing(userId, targetId);
+      })();
     }
     const relationships = AppState.getVal('followRelationships') || {};
     return (relationships[userId] || []).includes(targetId);
   },
 
-  async getFollowers(userId) {
+  getFollowers(userId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.getFollowers(userId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.getFollowers(userId);
+      })();
     }
     const relationships = AppState.getVal('followRelationships') || [];
     const users = AppState.getVal('users') || [];
@@ -391,31 +432,37 @@ export const ProfileService = {
     return followerIds.map(id => users.find(u => u.id === id)).filter(Boolean);
   },
 
-  async getFollowing(userId) {
+  getFollowing(userId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.getFollowing(userId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.getFollowing(userId);
+      })();
     }
     const relationships = AppState.getVal('followRelationships') || [];
     const users = AppState.getVal('users') || [];
     return (relationships[userId] || []).map(id => users.find(u => u.id === id)).filter(Boolean);
   },
 
-  async getFollowerCount(userId) {
+  getFollowerCount(userId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.getFollowerCount(userId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.getFollowerCount(userId);
+      })();
     }
-    const followers = await this.getFollowers(userId);
+    const followers = this.getFollowers(userId);
     return followers.length;
   },
 
-  async getFollowingCount(userId) {
+  getFollowingCount(userId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.getFollowingCount(userId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.getFollowingCount(userId);
+      })();
     }
-    const following = await this.getFollowing(userId);
+    const following = this.getFollowing(userId);
     return following.length;
   },
 
@@ -423,10 +470,12 @@ export const ProfileService = {
     return this.isFollowing(userId, otherId) && this.isFollowing(otherId, userId);
   },
 
-  async blockUser(targetId) {
+  blockUser(targetId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.block(targetId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.block(targetId);
+      })();
     }
     const blocked = AppState.getVal('blockedUsers') || [];
     if (blocked.includes(targetId)) {
@@ -437,10 +486,12 @@ export const ProfileService = {
     }
   },
 
-  async muteUser(targetId) {
+  muteUser(targetId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbProfiles.mute(targetId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbProfiles.mute(targetId);
+      })();
     }
     const muted = AppState.getVal('mutedUsers') || [];
     if (muted.includes(targetId)) {
@@ -451,7 +502,7 @@ export const ProfileService = {
     }
   },
 
-  async toggleCloseFriend(targetId) {
+  toggleCloseFriend(targetId) {
     const cf = AppState.getVal('closeFriends') || [];
     if (cf.includes(targetId)) {
       AppState.set('closeFriends', cf.filter(id => id !== targetId));
@@ -466,30 +517,36 @@ export const ProfileService = {
    MESSAGE SERVICE
    ========================================== */
 export const MessageService = {
-  async getConversations() {
+  getConversations() {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbMessages.getConversations();
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbMessages.getConversations();
+      })();
     }
     const convs = AppState.getVal('conversations') || [];
     const userId = AppState.getVal('currentUser');
     return convs.filter(c => c.members.includes(userId));
   },
 
-  async getMessages(convId) {
+  getMessages(convId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbMessages.getMessages(convId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbMessages.getMessages(convId);
+      })();
     }
     const messages = AppState.getVal('messages') || [];
     return messages.filter(m => m.conversationId === convId)
       .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   },
 
-  async sendMessage(convId, text) {
+  sendMessage(convId, text) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbMessages.sendMessage(convId, text);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbMessages.sendMessage(convId, text);
+      })();
     }
     const messages = AppState.getVal('messages') || [];
     const msg = {
@@ -514,10 +571,12 @@ export const MessageService = {
     return msg;
   },
 
-  async createConversation(members, name = null, isGroup = false) {
+  createConversation(members, name = null, isGroup = false) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbMessages.createConversation(members, name, isGroup);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbMessages.createConversation(members, name, isGroup);
+      })();
     }
     const convs = AppState.getVal('conversations') || [];
     const conv = {
@@ -534,9 +593,12 @@ export const MessageService = {
     return conv;
   },
 
-  async getUnreadCount(convId) {
+  getUnreadCount(convId) {
     const userId = AppState.getVal('currentUser');
-    const messages = await this.getMessages(convId);
+    const messages = this.getMessages(convId);
+    if (messages && messages.then) {
+      return messages.then(msgs => msgs.filter(m => m.userId !== userId && m.status !== 'read').length);
+    }
     return messages.filter(m => m.userId !== userId && m.status !== 'read').length;
   },
 };
@@ -545,45 +607,53 @@ export const MessageService = {
    NOTIFICATION SERVICE
    ========================================== */
 export const NotificationService = {
-  async getAll() {
+  getAll() {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbNotifications.getAll();
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbNotifications.getAll();
+      })();
     }
     return (AppState.getVal('notifications') || [])
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   },
 
-  async getUnreadCount() {
+  getUnreadCount() {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbNotifications.getUnreadCount();
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbNotifications.getUnreadCount();
+      })();
     }
     const notifs = AppState.getVal('notifications') || [];
     return notifs.filter(n => !n.read).length;
   },
 
-  async markAsRead(notifId) {
+  markAsRead(notifId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbNotifications.markAsRead(notifId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbNotifications.markAsRead(notifId);
+      })();
     }
     const notifications = AppState.getVal('notifications') || [];
     const notif = notifications.find(n => n.id === notifId);
     if (notif) { notif.read = true; AppState.set('notifications', notifications); }
   },
 
-  async markAllAsRead() {
+  markAllAsRead() {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbNotifications.markAllAsRead();
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbNotifications.markAllAsRead();
+      })();
     }
     const notifications = AppState.getVal('notifications') || [];
     notifications.forEach(n => n.read = true);
     AppState.set('notifications', notifications);
   },
 
-  async create(data) {
+  create(data) {
     const notifications = AppState.getVal('notifications') || [];
     const notif = {
       id: generateId(),
@@ -602,34 +672,42 @@ export const NotificationService = {
    REALTIME SERVICE
    ========================================== */
 export const RealtimeService = {
-  async subscribeToMessages(convId, callback) {
+  subscribeToMessages(convId, callback) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbRealtime.subscribeToMessages(convId, callback);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbRealtime.subscribeToMessages(convId, callback);
+      })();
     }
     return () => {};
   },
 
-  async subscribeToNotifications(callback) {
+  subscribeToNotifications(callback) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbRealtime.subscribeToNotifications(callback);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbRealtime.subscribeToNotifications(callback);
+      })();
     }
     return () => {};
   },
 
-  async subscribeToPosts(callback) {
+  subscribeToPosts(callback) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbRealtime.subscribeToPosts(callback);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbRealtime.subscribeToPosts(callback);
+      })();
     }
     return () => {};
   },
 
-  async trackPresence(userId) {
+  trackPresence(userId) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbRealtime.trackPresence(userId);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbRealtime.trackPresence(userId);
+      })();
     }
   },
 
@@ -644,10 +722,12 @@ export const RealtimeService = {
    SEARCH SERVICE
    ========================================== */
 export const SearchService = {
-  async search(query) {
+  search(query) {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbPosts.search(query);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbPosts.search(query);
+      })();
     }
     if (!query || query.length < 2) return { users: [], posts: [], hashtags: [], communities: [] };
 
@@ -843,10 +923,12 @@ export const AIService = {
    STORAGE SERVICE (Supabase only)
    ========================================== */
 export const MediaStorage = {
-  async upload(file, folder = 'uploads') {
+  upload(file, folder = 'uploads') {
     if (isSupabaseConfigured()) {
-      await loadSupabaseServices();
-      return await _sbStorage.upload(file, folder);
+      return (async () => {
+        await loadSupabaseServices();
+        return await _sbStorage.upload(file, folder);
+      })();
     }
     // Demo mode: return data URL
     return new Promise((resolve) => {

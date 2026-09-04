@@ -25,11 +25,18 @@ const bottomItems = [
   { id: 'settings', label: 'Settings', icon: 'settings', hash: '#/settings' },
 ];
 
+function getLocalUser() {
+  const userId = AppState.getVal('currentUser');
+  if (!userId) return null;
+  const users = AppState.getVal('users') || [];
+  return users.find(u => u.id === userId) || null;
+}
+
 export function renderSidebar() {
   const sidebar = document.getElementById('sidebar');
   if (!sidebar) return;
 
-  const user = AuthService.getCurrentUser();
+  const user = getLocalUser();
   const collapsed = AppState.getVal('sidebarCollapsed');
 
   sidebar.className = `sidebar ${collapsed ? 'collapsed' : ''}`;
@@ -96,7 +103,8 @@ export function renderSidebar() {
   const userCard = document.getElementById('sidebar-user-card');
   if (userCard) {
     userCard.addEventListener('click', () => {
-      Router.navigate(`/profile/${user.username}`);
+      const u = getLocalUser();
+      if (u) Router.navigate(`/profile/${u.username}`);
     });
   }
 

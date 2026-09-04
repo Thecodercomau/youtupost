@@ -3,33 +3,40 @@
    PWA Offline Shell
    ========================================== */
 
-const CACHE_NAME = 'youtupost-v1';
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/css/variables.css',
-  '/css/base.css',
-  '/css/layout.css',
-  '/css/components.css',
-  '/css/animations.css',
-  '/css/forms.css',
-  '/css/modals.css',
-  '/css/themes.css',
-  '/css/responsive.css',
-  '/js/app.js',
-  '/js/state.js',
-  '/js/storage.js',
-  '/js/utils.js',
-  '/js/router.js',
-  '/js/icons.js',
-  '/manifest.json',
+const CACHE_NAME = 'youtupost-v2';
+
+// Resolve paths relative to the service worker location
+function resolvePath(path) {
+  return new URL(path, self.location.href).pathname;
+}
+
+const ASSET_PATHS = [
+  './',
+  './index.html',
+  './css/variables.css',
+  './css/base.css',
+  './css/layout.css',
+  './css/components.css',
+  './css/animations.css',
+  './css/forms.css',
+  './css/modals.css',
+  './css/themes.css',
+  './css/responsive.css',
+  './js/app.js',
+  './js/state.js',
+  './js/storage.js',
+  './js/utils.js',
+  './js/router.js',
+  './js/icons.js',
+  './manifest.json',
 ];
+
+const ASSETS = ASSET_PATHS.map(resolvePath);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS).catch(() => {
-        // Silently fail if some assets are missing
         console.log('Some assets could not be cached');
       });
     })
@@ -49,12 +56,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      // Return cached version, fetch network in background
       const fetchPromise = fetch(event.request)
         .then((response) => {
           if (response.ok) {

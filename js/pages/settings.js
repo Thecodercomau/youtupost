@@ -21,12 +21,19 @@ const sections = [
   { id: 'about', label: 'About', icon: 'info' },
 ];
 
+function getLocalUser() {
+  const userId = AppState.getVal('currentUser');
+  if (!userId) return null;
+  const users = AppState.getVal('users') || [];
+  return users.find(u => u.id === userId) || null;
+}
+
 export function renderSettingsPage() {
   const page = document.getElementById('page-settings');
   if (!page) return;
 
   const settings = AppState.getVal('settings') || {};
-  const user = AuthService.getCurrentUser();
+  const user = getLocalUser();
 
   page.innerHTML = `
     <div style="max-width:900px;margin:0 auto;padding:var(--space-6) var(--space-4);">
@@ -130,7 +137,7 @@ function renderSettingsSection() {
       break;
 
     case 'account':
-      const user = AuthService.getCurrentUser();
+      const user = getLocalUser();
       container.innerHTML = `
         <h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-5);">Account</h3>
         <div style="margin-bottom:var(--space-4);">

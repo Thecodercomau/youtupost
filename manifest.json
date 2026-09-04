@@ -2,7 +2,7 @@
   "name": "Youtupost",
   "short_name": "Youtupost",
   "description": "Share what happens next. A futuristic social media platform.",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#08090D",
   "theme_color": "#08090D",

@@ -9,8 +9,9 @@ import { PostService, AuthService } from '../services/services.js';
 import { timeAgo, escapeHtml, generateAvatarSVG } from '../utils.js';
 import { openModal } from './modal.js';
 
-export function openCommentsModal(postId) {
-  const post = PostService.getPost(postId);
+export async function openCommentsModal(postId) {
+  const result = PostService.getPost(postId);
+  const post = result && typeof result.then === 'function' ? await result : result;
   if (!post) return;
 
   const users = AppState.getVal('users') || [];
@@ -84,18 +85,19 @@ export function openCommentsModal(postId) {
     input.value = '';
 
     // Re-render comments
-    const updatedPost = PostService.getPost(postId);
-    if (updatedPost) {
-      list.innerHTML = '';
-      const updatedComments = updatedPost.comments || [];
-      updatedComments.filter(c => !c.parentId).forEach(comment => {
-        list.appendChild(createCommentElement(comment, updatedPost, users));
-        updatedComments.filter(c => c.parentId === comment.id).forEach(reply => {
-          list.appendChild(createCommentElement(reply, updatedPost, users, true));
+    PostService.getPost(postId).then(updatedPost => {
+      if (updatedPost) {
+        list.innerHTML = '';
+        const updatedComments = updatedPost.comments || [];
+        updatedComments.filter(c => !c.parentId).forEach(comment => {
+          list.appendChild(createCommentElement(comment, updatedPost, users));
+          updatedComments.filter(c => c.parentId === comment.id).forEach(reply => {
+            list.appendChild(createCommentElement(reply, updatedPost, users, true));
+          });
         });
-      });
-      list.scrollTop = list.scrollHeight;
-    }
+        list.scrollTop = list.scrollHeight;
+      }
+    });
   };
 
   submit.addEventListener('click', submitComment);

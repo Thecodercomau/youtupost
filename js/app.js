@@ -307,8 +307,9 @@ function setupMobileNav() {
       const hash = item.dataset.hash;
       if (hash) {
         if (item.dataset.page === 'profile') {
-          const user = AuthService.getCurrentUser();
-          if (user) Router.navigate(`/profile/${user.username}`);
+          AuthService.getCurrentUser().then(u => {
+            if (u) Router.navigate(`/profile/${u.username}`);
+          });
         } else {
           Router.navigate(hash.slice(1));
         }
@@ -411,8 +412,9 @@ function setupKeyboardShortcuts() {
       case 'n': Router.navigate('/notifications'); break;
       case 'c': Router.navigate('/create'); break;
       case 'p':
-        const user = AuthService.getCurrentUser();
+      AuthService.getCurrentUser().then(user => {
         if (user) Router.navigate(`/profile/${user.username}`);
+      });
         break;
     }
   });
